@@ -9,46 +9,47 @@ $animals = [
     "Antarctica" => ["Wandering albatross", "King penguin", "Tern"]
 ];
 
-$pr = ' ';
+echo '<h3>Исходные животные</h3>';
+echo '<pre>';
+print_r($animals);
+echo '</pre>';
+
+$wordsCounter = 0;
 
 foreach ($animals as $continent => $value_array) {
     foreach ($value_array as $value_animal) {
-        if (strrpos(strval($value_animal), ' ')) {
-            /* Животные из двух слов*/
-            $doubleWords[] = $value_animal;
-            /* Первые слова с названиями континентов */
-            $doubleWordsFirst[] = '<h2>' . $continent . '</h2>' . substr($value_animal, 0, strripos($value_animal, ' '));
-            /* вторые слова */
-            $doubleWordsSecond[] = substr($value_animal, strripos($value_animal, ' '), strlen($value_animal));
+        if (str_word_count($value_animal) === 2) {
+            $doubles[$continent][] = $value_animal;
+            $wordsCounter++;
+            $firstHalf[$continent][] = explode(' ', $value_animal)[0];
+            $secondHalf[] = explode(' ', $value_animal)[1];
         }
     }
 }
 
-echo "<h3>Животные из двух слов</h3>";
-
+echo '<h3>Животные из двух слов</h3>';
 echo '<pre>';
-print_r($doubleWords);
+print_r($doubles);
 echo '</pre>';
 
-$arrayKeys = '012345';
+$arrayKeys = '';
 
-/* Номера первых слов */
-$firstWordNumbers = str_shuffle($arrayKeys);
-/* Номера вторых слов */
-$secondWordNumbers = str_shuffle($arrayKeys);
-
-/* Итоговый массив из новых животных, с континентами */
-for ($i = 0; $i < strlen($arrayKeys); $i++) {
-    $newAnimals[] = $doubleWordsFirst[$firstWordNumbers[$i]] . $doubleWordsSecond[$secondWordNumbers[$i]];
+for ($i = 0; $i < $wordsCounter; $i++) {
+    $arrayKeys.= strval($i);
 }
 
-echo "<h1>Новые животные из двух слов</h1>";
+$randomNumbers = str_shuffle($arrayKeys);
 
-echo '<ul>';
-foreach ($newAnimals as $animal) {
-    echo '<li>';
-    echo $animal;
-    echo ($animal === end($newAnimals))? '</li>':',</li>'; // запятая если не последний элемент
+foreach ($firstHalf as $continent => $animals) {
+    foreach ($animals as $key => $animal) {
+        $firstHalf[$continent][$key].= ' '.$secondHalf[substr($randomNumbers, 0, 1)];
+        $randomNumbers = substr($randomNumbers, 1);
+    }
 }
-echo '</ul>';
 
+echo '<h3>Итоговый результат</h3>';
+
+foreach ($firstHalf as $continent => $animals) {
+    echo '<h2>'.$continent.'</h2>';
+    echo implode(', ', $animals);
+}
